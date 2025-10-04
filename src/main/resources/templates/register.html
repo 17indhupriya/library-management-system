@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head('Register')"></head>
+<body>
+    <div class="container">
+        <div class="login-form">
+            <h2 class="text-center mb-4">Register New Account</h2>
+            
+            <div th:if="${param.error}" class="alert alert-danger">
+                Registration failed. Username or email might be already taken.
+            </div>
+            
+            <form th:action="@{/register}" method="post" th:object="${user}">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" th:field="*{username}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" th:field="*{password}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" th:field="*{email}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Role</label>
+                    <div class="d-flex gap-4">
+                        <div class="form-check">
+                            <input type="radio" id="student" th:field="*{role}" value="ROLE_STUDENT" class="form-check-input" required>
+                            <label for="student" class="form-check-label">Student</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="librarian" th:field="*{role}" value="ROLE_LIBRARIAN" class="form-check-input">
+                            <label for="librarian" class="form-check-label">Librarian</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <a th:href="@{/login}" class="text-decoration-none">Back to login</a>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="layout :: footer"></div>
+</body>
+</html>

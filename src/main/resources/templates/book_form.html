@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head(${book.id} ? 'Edit Book' : 'Add Book')"></head>
+<body>
+    <div th:replace="layout :: nav"></div>
+    <div class="container mt-4">
+        <div th:replace="layout :: alerts"></div>
+        
+        <div class="book-form">
+            <h2 th:text="${book.id} ? 'Edit Book' : 'Add New Book'"></h2>
+            
+            <form th:action="${book.id} ? @{/books/edit/{id}(id=${book.id})} : @{/books/add}" 
+                  th:object="${book}" method="post">
+                
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <input type="text" class="form-control" id="author" th:field="*{author}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" class="form-control" id="isbn" th:field="*{isbn}" required
+                           th:readonly="${book.id != null}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="available">Availability</label>
+                    <select class="form-control" id="available" th:field="*{available}">
+                        <option th:value="true">Available</option>
+                        <option th:value="false">Not Available</option>
+                    </select>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a th:href="@{/books}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div th:replace="layout :: footer"></div>
+</body>
+</html>

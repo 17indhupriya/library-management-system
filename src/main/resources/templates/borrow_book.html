@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head('Borrow Book')"></head>
+<body>
+    <div th:replace="layout :: nav"></div>
+    <div class="container mt-4">
+        <div th:replace="layout :: alerts"></div>
+        
+        <div class="book-form">
+            <h2>Borrow Book</h2>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${book.title}">Book Title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted" th:text="${book.author}">Author</h6>
+                    <p class="card-text">ISBN: <span th:text="${book.isbn}"></span></p>
+                </div>
+            </div>
+            
+            <form th:action="@{/books/borrow/{id}(id=${book.id})}" method="post" class="needs-validation" novalidate>
+                <div class="form-group">
+                    <label for="issueDate">Issue Date</label>
+                    <input type="date" class="form-control" id="issueDate" name="issueDate" required
+                           th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                           th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                    <div class="invalid-feedback">
+                        Please select an issue date.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="returnDate">Return Date</label>
+                    <input type="date" class="form-control" id="returnDate" name="returnDate" required
+                           th:min="${#temporals.format(#temporals.createNow().plusDays(1), 'yyyy-MM-dd')}"
+                           th:value="${#temporals.format(#temporals.createNow().plusDays(14), 'yyyy-MM-dd')}">
+                    <div class="invalid-feedback">
+                        Please select a return date (at least one day after the issue date).
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Borrow Book</button>
+                    <a th:href="@{/books}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div th:replace="layout :: footer"></div>
+    
+    <script>
+    // JavaScript for form validation
+    (function() {
+        'use strict';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch all forms that need validation
+            var forms = document.querySelectorAll('.needs-validation');
+            
+            // Add validation on submit
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+            
+            // Add custom validation for return date
+            var issueDateInput = document.getElementById('issueDate');
+            var returnDateInput = document.getElementById('returnDate');
+            
+            issueDateInput.addEventListener('change', function() {
+                // Update return date min value when issue date changes
+                var issueDate = new Date(this.value);
+                issueDate.setDate(issueDate.getDate() + 1);
+                returnDateInput.min = issueDate.toISOString().split('T')[0];
+                
+                // If return date is now invalid, clear it
+                if (new Date(returnDateInput.value) <= new Date(this.value)) {
+                    returnDateInput.value = '';
+                }
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
