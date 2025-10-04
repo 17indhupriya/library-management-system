@@ -125,4 +125,4 @@ Developed by V.Indhupriya
 
 ---
 
-✨ This version includes **Run with Maven**, looks **professional**, and follows **open-source best practices**.
+✨ This version includes **Run with Maven**, which looks **professional**.
