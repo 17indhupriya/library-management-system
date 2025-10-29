@@ -1,62 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
-<head>
-    <title>My Borrowed Books</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head('My Borrowed Books')}"></head>
 <body>
-    <div layout:fragment="content">
-        <div class="container mt-4">
-            <h2 class="mb-4">My Borrowed Books</h2>
-            
-            <div class="card">
-                <div class="card-body">
-                    <div th:if="${borrowedBooks.empty}" class="alert alert-info">
-                        You haven't borrowed any books yet.
-                    </div>
-                    
-                    <div th:unless="${borrowedBooks.empty}">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Author</th>
-                                        <th>ISBN</th>
-                                        <th>Borrowed Date</th>
-                                        <th>Due Date</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="book : ${borrowedBooks}">
-                                        <td th:text="${book.title}">Book Title</td>
-                                        <td th:text="${book.author}">Author Name</td>
-                                        <td th:text="${book.isbn}">ISBN</td>
-                                        <td th:text="${#temporals.format(book.borrowedDate, 'dd MMM yyyy')}">Borrow Date</td>
-                                        <td>
-                                            <span th:text="${#temporals.format(book.dueDate, 'dd MMM yyyy')}"
-                                                  th:class="${#temporals.create().isAfter(book.dueDate)} ? 'text-danger' : ''">
-                                                Due Date
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span th:if="${#temporals.create().isAfter(book.dueDate)}" 
-                                                  class="badge bg-danger">Overdue</span>
-                                            <span th:unless="${#temporals.create().isAfter(book.dueDate)}" 
-                                                  class="badge bg-success">On Time</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <div th:replace="~{layout :: nav}"></div>
+    <main style="padding: 2rem;">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">
+                        <i class="bi bi-bookmark"></i> My Borrowed Books
+                    </h1>
+                    <p style="color: var(--text-light); font-size: 1.1rem;">
+                        Books you've borrowed from the library
+                    </p>
+                </div>
+                <a th:href="@{/books}" class="btn btn-primary" style="height: fit-content;">
+                    <i class="bi bi-plus-circle"></i> Borrow More
+                </a>
+            </div>
+
+            <!-- Overdue Alert -->
+            <div th:if="${isOverdue}" class="alert alert-warning" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: linear-gradient(135deg, #fef3c7, #fcd34d); border: 1px solid #fbbf24; border-radius: 12px;">
+                <i class="bi bi-exclamation-triangle" style="font-size: 1.5rem; color: #d97706;"></i>
+                <div>
+                    <strong style="color: #92400e;">Overdue Books!</strong>
+                    <p style="margin: 0.3rem 0 0; color: #b45309; font-size: 0.95rem;">You have overdue books. Please return them as soon as possible to avoid fines.</p>
+                </div>
+            </div>
+
+            <!-- Books Table -->
+            <div class="glass-card">
+                <div th:if="${#lists.isEmpty(borrowedBooks)}" style="text-align: center; padding: 3rem;">
+                    <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-light); display: block; margin-bottom: 1rem;"></i>
+                    <h3 style="margin-bottom: 0.5rem;">No Books Borrowed Yet</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Start browsing and borrowing books from the library!</p>
+                    <a th:href="@{/books}" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Browse Books
+                    </a>
+                </div>
+                <div th:unless="${#lists.isEmpty(borrowedBooks)}" class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-book"></i> Book Title</th>
+                                <th><i class="bi bi-person"></i> Author</th>
+                                <th><i class="bi bi-calendar-event"></i> Borrowed</th>
+                                <th><i class="bi bi-calendar-check"></i> Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="book : ${borrowedBooks}">
+                                <td>
+                                    <strong th:text="${book.title}">Book Title</strong>
+                                </td>
+                                <td th:text="${book.author}">Author Name</td>
+                                <td th:text="${#temporals.format(book.borrowedDate, 'dd MMM yyyy')}">Borrow Date</td>
+                                <td th:text="${#temporals.format(book.dueDate, 'dd MMM yyyy')}">Return Date</td>
+                                <td>
+                                    <span th:if="${book.isOverdue()}" style="display: inline-block; padding: 0.35rem 0.8rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
+                                        <i class="bi bi-exclamation-circle"></i> Overdue
+                                    </span>
+                                    <span th:unless="${book.isOverdue()}" style="display: inline-block; padding: 0.35rem 0.8rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
+                                        <i class="bi bi-check-circle"></i> On Time
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/books/return/{id}(id=${book.id})}" 
+                                       class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;"
+                                       onclick="return confirm('Return this book?')">
+                                        <i class="bi bi-arrow-return-left"></i> Return
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
+    <div th:replace="~{layout :: footer}"></div>
 </body>
 </html>

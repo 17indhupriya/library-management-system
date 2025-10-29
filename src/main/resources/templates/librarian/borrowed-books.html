@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head('Borrowed Books')}"></head>
+<body>
+    <div th:replace="~{layout :: nav}"></div>
+    <main style="padding: 2rem;">
+        <div class="container-fluid">
+            <div th:replace="~{layout :: alerts}"></div>
+            
+            <!-- Header -->
+            <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">
+                        <i class="bi bi-bookmark-check"></i> Borrowed Books Management
+                    </h1>
+                    <p style="color: var(--text-light); font-size: 1.1rem;">
+                        Track and manage all borrowed books
+                    </p>
+                </div>
+                <a th:href="@{/librarian/manage-books}" class="btn btn-primary" style="height: fit-content;">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+            
+            <!-- Borrowed Books Table -->
+            <div th:if="${!#lists.isEmpty(borrowedBooks)}" class="glass-card">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><i class="bi bi-book"></i> Book Title</th>
+                                <th><i class="bi bi-person"></i> Author</th>
+                                <th><i class="bi bi-person-circle"></i> Borrowed By</th>
+                                <th><i class="bi bi-calendar-event"></i> Borrowed</th>
+                                <th><i class="bi bi-calendar-check"></i> Due Date</th>
+                                <th>Status</th>
+                                <th>Fine</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="book : ${borrowedBooks}">
+                                <td>
+                                    <strong th:text="${book.title}"></strong>
+                                </td>
+                                <td th:text="${book.author}"></td>
+                                <td th:text="${book.borrowedBy?.fullName ?: 'Unknown'}"></td>
+                                <td th:text="${book.borrowedDate != null ? #temporals.format(book.borrowedDate, 'dd-MMM-yyyy') : 'N/A'}"></td>
+                                <td th:text="${book.dueDate != null ? #temporals.format(book.dueDate, 'dd-MMM-yyyy') : 'N/A'}"></td>
+                                <td>
+                                    <span th:if="${book.overdue}" style="display: inline-block; padding: 0.35rem 0.8rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
+                                        <i class="bi bi-exclamation-circle"></i> Overdue
+                                    </span>
+                                    <span th:unless="${book.overdue}" style="display: inline-block; padding: 0.35rem 0.8rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
+                                        <i class="bi bi-check-circle"></i> Active
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:if="${book.calculateFine() > 0}" style="color: #ef4444; font-weight: 600;">
+                                        Rs. <span th:text="${#numbers.formatDecimal(book.calculateFine(), 0, 2)}"></span>
+                                    </span>
+                                    <span th:unless="${book.calculateFine() > 0}" style="color: var(--text-light);">-</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/librarian/books/return/{id}(id=${book.id})}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-success" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;"
+                                                onclick="return confirm('Mark this book as returned?')">
+                                            <i class="bi bi-check-lg"></i> Return
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(borrowedBooks)}" class="glass-card" style="text-align: center; padding: 3rem;">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-light); display: block; margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem;">No Borrowed Books</h3>
+                <p style="color: var(--text-light); margin-bottom: 1.5rem;">All books are currently available.</p>
+                <a th:href="@{/librarian/manage-books}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Manage
+                </a>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{layout :: footer}"></div>
+</body>
+</html>

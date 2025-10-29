@@ -1,49 +1,84 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="layout :: head(${book.id} ? 'Edit Book' : 'Add Book')"></head>
+<head th:replace="~{layout :: head(${book.id} ? 'Edit Book' : 'Add Book')}"></head>
 <body>
-    <div th:replace="layout :: nav"></div>
-    <div class="container mt-4">
-        <div th:replace="layout :: alerts"></div>
-        
-        <div class="book-form">
-            <h2 th:text="${book.id} ? 'Edit Book' : 'Add New Book'"></h2>
+    <div th:replace="~{layout :: nav}"></div>
+    <main style="padding: 2rem; min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center;">
+        <div class="container-fluid" style="max-width: 600px;">
+            <div th:replace="~{layout :: alerts}"></div>
             
-            <form th:action="${book.id} ? @{/books/edit/{id}(id=${book.id})} : @{/books/add}" 
-                  th:object="${book}" method="post">
-                
-                <div class="form-group">
-                    <label for="title">Title</label>
-                    <input type="text" class="form-control" id="title" th:field="*{title}" required>
+            <!-- Form Header -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="bi bi-book-half" style="font-size: 2.5rem; color: var(--primary-blue); display: block; margin-bottom: 1rem;"></i>
+                <h1 style="font-size: 2rem; background: linear-gradient(135deg, var(--primary-blue), var(--secondary-lavender)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
+                    <span th:if="${book.id}">Edit Book</span>
+                    <span th:unless="${book.id}">Add New Book</span>
+                </h1>
+                <p style="color: var(--text-light);">
+                    <span th:if="${book.id}">Update book information</span>
+                    <span th:unless="${book.id}">Add a new book to the library</span>
+                </p>
+            </div>
+            
+            <!-- Form Card -->
+            <div class="glass-card">
+                <div style="padding: 2rem;">
+                    <form th:action="${book.id} ? @{/books/edit/{id}(id=${book.id})} : @{/books/add}" 
+                          th:object="${book}" method="post">
+                        
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label for="title" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+                                <i class="bi bi-type"></i> Book Title
+                            </label>
+                            <input type="text" class="form-control" id="title" th:field="*{title}" required
+                                   placeholder="Enter book title"
+                                   style="padding: 0.75rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 1rem;">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label for="author" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+                                <i class="bi bi-person"></i> Author
+                            </label>
+                            <input type="text" class="form-control" id="author" th:field="*{author}" required
+                                   placeholder="Enter author name"
+                                   style="padding: 0.75rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 1rem;">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label for="isbn" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+                                <i class="bi bi-upc"></i> ISBN
+                            </label>
+                            <input type="text" class="form-control" id="isbn" th:field="*{isbn}" required
+                                   placeholder="Enter ISBN"
+                                   th:readonly="${book.id != null}"
+                                   style="padding: 0.75rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 1rem;">
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 2rem;">
+                            <label for="available" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+                                <i class="bi bi-check-circle"></i> Availability Status
+                            </label>
+                            <select class="form-control" id="available" th:field="*{available}"
+                                   style="padding: 0.75rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 1rem;">
+                                <option th:value="true">Available</option>
+                                <option th:value="false">Not Available</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                                <i class="bi bi-check-lg"></i> Save Book
+                            </button>
+                            <a th:href="@{/books}" class="btn btn-secondary" style="flex: 1;">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="form-group">
-                    <label for="author">Author</label>
-                    <input type="text" class="form-control" id="author" th:field="*{author}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="isbn">ISBN</label>
-                    <input type="text" class="form-control" id="isbn" th:field="*{isbn}" required
-                           th:readonly="${book.id != null}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="available">Availability</label>
-                    <select class="form-control" id="available" th:field="*{available}">
-                        <option th:value="true">Available</option>
-                        <option th:value="false">Not Available</option>
-                    </select>
-                </div>
-                
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                    <a th:href="@{/books}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+    </main>
     
-    <div th:replace="layout :: footer"></div>
+    <div th:replace="~{layout :: footer}"></div>
 </body>
 </html>

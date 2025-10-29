@@ -32,8 +32,31 @@ public class StudentController {
         // Get books borrowed by this user
         List<Book> borrowedBooks = bookService.findBooksBorrowedByUser(currentUser);
         
+        // Check if any book is overdue
+        boolean isOverdue = borrowedBooks.stream().anyMatch(Book::isOverdue);
+        
         model.addAttribute("borrowedBooks", borrowedBooks);
         model.addAttribute("student", currentUser);
+        model.addAttribute("isOverdue", isOverdue);
+        return "student/my-borrowed-books";
+    }
+    
+    @GetMapping("/books/borrowed")
+    public String myBorrowedBooks(Model model) {
+        // Get current logged-in user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User currentUser = userService.findByUsername(username);
+
+        // Get books borrowed by this user
+        List<Book> borrowedBooks = bookService.findBooksBorrowedByUser(currentUser);
+        
+        // Check if any book is overdue
+        boolean isOverdue = borrowedBooks.stream().anyMatch(Book::isOverdue);
+        
+        model.addAttribute("borrowedBooks", borrowedBooks);
+        model.addAttribute("student", currentUser);
+        model.addAttribute("isOverdue", isOverdue);
         return "student/my-borrowed-books";
     }
 }

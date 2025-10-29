@@ -1,59 +1,112 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="layout :: head('Register')"></head>
-<body>
-    <div class="container">
-        <div class="login-form">
-            <h2 class="text-center mb-4">Register New Account</h2>
-            
-            <div th:if="${param.error}" class="alert alert-danger">
-                Registration failed. Username or email might be already taken.
+<head th:replace="~{layout :: head('Register')}"></head>
+<body style="display: flex; flex-direction: column; min-height: 100vh; background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 50%, #fce7f3 100%);">
+    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+        <form th:action="@{/register}" method="post" th:object="${user}" style="width: 100%; max-width: 450px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; padding: 3rem 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <!-- Header -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="bi bi-book-half" style="font-size: 2.5rem; color: #8b5cf6; display: block; margin-bottom: 1rem;"></i>
+                <h1 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(135deg, #8b5cf6, #6d28d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Create Account</h1>
+                <p style="color: #64748b; font-size: 0.95rem;">Join our library community</p>
             </div>
-            
-            <form th:action="@{/register}" method="post" th:object="${user}">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" th:field="*{username}" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" th:field="*{password}" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" th:field="*{email}" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Role</label>
-                    <div class="d-flex gap-4">
-                        <div class="form-check">
-                            <input type="radio" id="student" th:field="*{role}" value="ROLE_STUDENT" class="form-check-input" required>
-                            <label for="student" class="form-check-label">Student</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" id="librarian" th:field="*{role}" value="ROLE_LIBRARIAN" class="form-check-input">
-                            <label for="librarian" class="form-check-label">Librarian</label>
-                        </div>
+
+            <!-- Error Messages -->
+            <div th:if="${param.error}" style="margin-bottom: 1.5rem; padding: 0.8rem 1rem; background: linear-gradient(135deg, #fee2e2, #fecaca); border: 1px solid #fca5a5; border-radius: 12px; display: flex; align-items: center; gap: 0.75rem; color: #991b1b; font-size: 0.9rem;">
+                <i class="bi bi-exclamation-circle" style="font-size: 1.2rem;"></i>
+                <span>Registration failed. Please check your inputs.</span>
+            </div>
+
+            <!-- Full Name -->
+            <div style="margin-bottom: 1.2rem;">
+                <label for="fullName" style="font-weight: 600; margin-bottom: 0.4rem; display: block; color: #1e293b; font-size: 0.9rem;">
+                    <i class="bi bi-person-fill"></i> Full Name
+                </label>
+                <input type="text" id="fullName" th:field="*{fullName}" placeholder="John Doe" required
+                       style="width: 100%; padding: 0.7rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 0.95rem; transition: all 0.3s; font-family: 'Inter', sans-serif;">
+            </div>
+
+            <!-- Username -->
+            <div style="margin-bottom: 1.2rem;">
+                <label for="username" style="font-weight: 600; margin-bottom: 0.4rem; display: block; color: #1e293b; font-size: 0.9rem;">
+                    <i class="bi bi-at"></i> Username
+                </label>
+                <input type="text" id="username" th:field="*{username}" placeholder="johndoe123" required
+                       style="width: 100%; padding: 0.7rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 0.95rem; transition: all 0.3s; font-family: 'Inter', sans-serif;">
+            </div>
+
+            <!-- Email -->
+            <div style="margin-bottom: 1.2rem;">
+                <label for="email" style="font-weight: 600; margin-bottom: 0.4rem; display: block; color: #1e293b; font-size: 0.9rem;">
+                    <i class="bi bi-envelope-fill"></i> Email
+                </label>
+                <input type="email" id="email" th:field="*{email}" placeholder="john@example.com" required
+                       style="width: 100%; padding: 0.7rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 0.95rem; transition: all 0.3s; font-family: 'Inter', sans-serif;">
+            </div>
+
+            <!-- Password -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="password" style="font-weight: 600; margin-bottom: 0.4rem; display: block; color: #1e293b; font-size: 0.9rem;">
+                    <i class="bi bi-lock-fill"></i> Password
+                </label>
+                <input type="password" id="password" th:field="*{password}" placeholder="Create a strong password" required
+                       style="width: 100%; padding: 0.7rem 1rem; border: none; background: rgba(255,255,255,0.5); border-radius: 12px; font-size: 0.95rem; transition: all 0.3s; font-family: 'Inter', sans-serif;">
+            </div>
+
+            <!-- Role Selection -->
+            <div style="margin-bottom: 2rem;">
+                <label style="font-weight: 600; margin-bottom: 1rem; display: block; color: #1e293b; font-size: 0.9rem;">
+                    <i class="bi bi-person-badge"></i> I am a:
+                </label>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <input type="radio" id="student" th:field="*{role}" value="ROLE_STUDENT" required style="display: none;">
+                        <label for="student" style="display: block; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; font-weight: 500; color: #64748b;">
+                            <i class="bi bi-mortarboard" style="font-size: 1.3rem; display: block; margin-bottom: 0.3rem; color: #2563eb;"></i>
+                            Student
+                        </label>
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="radio" id="librarian" th:field="*{role}" value="ROLE_LIBRARIAN" required style="display: none;">
+                        <label for="librarian" style="display: block; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; font-weight: 500; color: #64748b;">
+                            <i class="bi bi-person-badge" style="font-size: 1.3rem; display: block; margin-bottom: 0.3rem; color: #8b5cf6;"></i>
+                            Librarian
+                        </label>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn btn-primary w-100">Register</button>
-            </form>
-            
-            <div class="text-center mt-3">
-                <a th:href="@{/login}" class="text-decoration-none">Back to login</a>
             </div>
-        </div>
-    </div>
-    
-    <div th:replace="layout :: footer"></div>
+
+            <script>
+            document.getElementById('student').addEventListener('change', function() {
+                document.querySelector('label[for="student"]').style.borderColor = '#2563eb';
+                document.querySelector('label[for="student"]').style.backgroundColor = '#eff6ff';
+                document.querySelector('label[for="librarian"]').style.borderColor = '#e2e8f0';
+                document.querySelector('label[for="librarian"]').style.backgroundColor = 'transparent';
+            });
+            document.getElementById('librarian').addEventListener('change', function() {
+                document.querySelector('label[for="librarian"]').style.borderColor = '#8b5cf6';
+                document.querySelector('label[for="librarian"]').style.backgroundColor = '#f3e8ff';
+                document.querySelector('label[for="student"]').style.borderColor = '#e2e8f0';
+                document.querySelector('label[for="student"]').style.backgroundColor = 'transparent';
+            });
+            </script>
+
+            <!-- Register Button -->
+            <button type="submit" style="width: 100%; padding: 0.9rem 1.5rem; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); margin-bottom: 1.5rem;">
+                <i class="bi bi-pencil-square"></i> Create Account
+            </button>
+
+            <!-- Login Link -->
+            <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e2e8f0;">
+            <div style="text-align: center;">
+                <p style="color: #64748b; margin-bottom: 0.8rem; font-size: 0.95rem;">Already have an account?</p>
+                <a th:href="@{/login}" style="display: block; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #2563eb, #1e40af); color: white; border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.3s; text-align: center;">
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                </a>
+            </div>
+        </form>
+    </main>
+
+    <div th:replace="~{layout :: footer}"></div>
 </body>
 </html>

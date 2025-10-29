@@ -12,6 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Controller
 @RequestMapping("/books")
 public class BookController {
@@ -83,13 +86,61 @@ public class BookController {
         return "redirect:/books";
     }
 
+    @GetMapping("/borrow/{id}")
+    public String borrowBookPage(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("book", bookService.getBookById(id).orElseThrow());
+            return "borrow_book";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", "Book not found");
+            return "redirect:/books";
+        }
+    }
+
+    @PostMapping("/borrow/{id}")
+    public String borrowBook(@PathVariable Long id, 
+                           @RequestParam(required = false) String borrowDate,
+                           @RequestParam(required = false) String returnDate,
+                           @AuthenticationPrincipal UserDetails userDetails,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            User student = userService.getUserByUsername(userDetails.getUsername()).orElseThrow();
+            
+            LocalDateTime borrowDateTime = LocalDateTime.now();
+            LocalDateTime returnDateTime = LocalDateTime.now().plusDays(14); // Default 2 weeks
+            
+            // Parse dates if provided
+            if (borrowDate != null && !borrowDate.isEmpty()) {
+                try {
+                    borrowDateTime = LocalDateTime.parse(borrowDate + "T00:00:00");
+                } catch (Exception e) {
+                    // Use current date if parsing fails
+                }
+            }
+            
+            if (returnDate != null && !returnDate.isEmpty()) {
+                try {
+                    returnDateTime = LocalDateTime.parse(returnDate + "T23:59:59");
+                } catch (Exception e) {
+                    // Use default if parsing fails
+                }
+            }
+            
+            bookService.borrowBook(id, student, borrowDateTime, returnDateTime);
+            redirectAttributes.addFlashAttribute("success", "Book borrowed successfully!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/books";
+    }
+    
     @GetMapping("/issue/{id}")
     public String issueBook(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails,
                           RedirectAttributes redirectAttributes) {
         try {
             User student = userService.getUserByUsername(userDetails.getUsername()).orElseThrow();
-            bookService.issueBook(id, student);
-            redirectAttributes.addFlashAttribute("success", "Book issued successfully!");
+            bookService.borrowBook(id, student);
+            redirectAttributes.addFlashAttribute("success", "Book borrowed successfully!");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

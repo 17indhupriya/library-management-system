@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -22,6 +23,15 @@ public class LibrarianController {
         model.addAttribute("books", allBooks);
         model.addAttribute("newBook", new Book());
         return "librarian/manage-books";
+    }
+    
+    @GetMapping("/librarian/borrowed-books")
+    public String viewBorrowedBooks(Model model) {
+        List<Book> borrowedBooks = bookService.getAllBooks().stream()
+                .filter(b -> !b.isAvailable())
+                .toList();
+        model.addAttribute("borrowedBooks", borrowedBooks);
+        return "librarian/borrowed-books";
     }
 
     @PostMapping("/librarian/books/add")
@@ -56,5 +66,16 @@ public class LibrarianController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error deleting book: " + e.getMessage());
         }
         return "redirect:/librarian/manage-books";
+    }
+    
+    @PostMapping("/librarian/books/return/{id}")
+    public String returnBook(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            bookService.returnBook(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Book marked as returned!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+        }
+        return "redirect:/librarian/borrowed-books";
     }
 }

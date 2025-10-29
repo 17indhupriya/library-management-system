@@ -4,139 +4,456 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title}">Library Management System</title>
+    <title th:text="${title}">📚 Library Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --success-color: #27ae60;
-            --danger-color: #e74c3c;
-            --warning-color: #f1c40f;
-            --light-bg: #f8f9fa;
-            --dark-bg: #2c3e50;
+            --primary-blue: #2563eb;
+            --primary-dark-blue: #1e40af;
+            --primary-light-blue: #dbeafe;
+            --success-green: #10b981;
+            --success-light-green: #d1fae5;
+            --accent-orange: #f59e0b;
+            --error-red: #ef4444;
+            --error-light-red: #fee2e2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --neutral-gray: #64748b;
+            --border-gray: #e2e8f0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
         }
         
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             min-height: 100vh;
-            background: var(--light-bg);
+            background: linear-gradient(135deg, var(--light-bg) 0%, #f1f5f9 100%);
             display: flex;
             flex-direction: column;
+            color: var(--dark-bg);
         }
         
+        /* Navbar Styling */
         .navbar {
-            background-color: white !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid var(--border-gray);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 0.75rem 0;
+            overflow: visible !important;
         }
         
         .navbar-brand {
-            font-weight: 600;
-            color: var(--primary-color) !important;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary-dark-blue) !important;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand i {
+            font-size: 1.6rem;
+            -webkit-text-fill-color: var(--primary-blue);
         }
         
         .nav-link {
-            color: var(--secondary-color) !important;
+            color: var(--neutral-gray) !important;
             font-weight: 500;
-            transition: color 0.3s ease;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .nav-link:hover {
-            color: var(--primary-color) !important;
+            color: var(--primary-blue) !important;
+            background-color: var(--primary-light-blue);
+            transform: translateX(2px);
         }
         
+        .nav-link i {
+            font-size: 1.1rem;
+        }
+        
+        .navbar-toggler {
+            border: none;
+            padding: 0.25rem;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.25rem var(--primary-light-blue);
+        }
+        
+        /* Dropdown Menu */
+        .dropdown-menu {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-item {
+            transition: all 0.2s ease;
+            color: var(--dark-bg);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--primary-light-blue);
+            color: var(--primary-dark-blue);
+        }
+        
+        .dropdown-item form {
+            width: 100%;
+        }
+        
+        .dropdown-item button {
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            color: var(--dark-bg);
+            font-weight: 500;
+        }
+        
+        .dropdown-item button:hover {
+            background-color: var(--error-light-red);
+            color: var(--error-red);
+        }
+        
+        /* Dropdown Fix */
+        .dropdown-menu {
+            z-index: 1050 !important;
+            min-width: 180px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            position: absolute !important;
+            top: 100% !important;
+            display: none;
+        }
+        
+        .dropdown-menu.show {
+            display: block !important;
+            z-index: 1050 !important;
+        }
+
+        .dropdown-menu .dropdown-item {
+            padding: 0.5rem 1rem;
+        }
+        .alert {
+            border: none;
+            border-radius: 8px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .alert-success {
+            border-left-color: var(--success-green);
+            background-color: var(--success-light-green);
+            color: #047857;
+        }
+        
+        .alert-danger {
+            border-left-color: var(--error-red);
+            background-color: var(--error-light-red);
+            color: #991b1b;
+        }
+        
+        .alert-warning {
+            border-left-color: var(--accent-orange);
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .alert-info {
+            border-left-color: var(--primary-blue);
+            background-color: var(--primary-light-blue);
+            color: var(--primary-dark-blue);
+        }
+        
+        .alert-dismissible .btn-close {
+            transition: all 0.2s ease;
+        }
+        
+        .alert-dismissible .btn-close:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Footer Styling */
         .footer {
             margin-top: auto;
-            background-color: white !important;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-top: 1px solid var(--border-gray);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+            padding: 2rem 0;
+        }
+        
+        .footer .text-muted {
+            color: var(--neutral-gray) !important;
+            font-weight: 500;
+        }
+        
+        .footer .bi-heart-fill {
+            animation: heartbeat 0.6s ease infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.1);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Main Content */
+        main {
+            flex: 1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem !important;
+            }
+            
+            .footer {
+                padding: 1rem 0;
+            }
+            
+            .footer .row > div {
+                text-align: center !important;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 0.5rem 0;
+            }
+            
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .nav-link {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.5rem !important;
+            }
         }
     </style>
 </head>
 <body>
     <nav th:fragment="nav" class="navbar navbar-expand-lg">
-        <div class="container">
+        <div class="container-fluid" style="padding: 0 2rem;">
             <a class="navbar-brand" th:href="@{/dashboard}">
-                <i class="bi bi-book"></i> Library System
+                <i class="bi bi-book-half"></i> LibraryHub
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/dashboard}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+                            <i class="bi bi-house-fill"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/books}">
-                            <i class="bi bi-journal-text"></i> Books
+                            <i class="bi bi-book"></i> Books
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('STUDENT')">
-                        <a class="nav-link" th:href="@{/student/borrowed}">
-                            <i class="bi bi-collection"></i> My Borrowed Books
+                        <a class="nav-link" th:href="@{/books/borrowed}">
+                            <i class="bi bi-calendar-check"></i> My Books
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('LIBRARIAN')">
                         <a class="nav-link" th:href="@{/librarian/manage-books}">
-                            <i class="bi bi-gear"></i> Manage Books
+                            <i class="bi bi-collection"></i> Borrowed
                         </a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle"></i>
-                            <span sec:authentication="name"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li>
-                                <form th:action="@{/logout}" method="post">
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                    <li class="nav-item">
+                        <span class="nav-link" style="color: var(--primary-blue) !important; pointer-events: none;">
+                            <i class="bi bi-person-circle"></i> <span sec:authentication="name"></span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div th:fragment="alerts" class="container mt-3">
+    <div th:fragment="alerts" class="container mt-4">
         <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill"></i>
+            <span>✅</span>
             <span th:text="${success}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle-fill"></i>
+            <span>❌</span>
             <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>⚠️</span>
             <span th:text="${warning}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${info}" class="alert alert-info alert-dismissible fade show" role="alert">
+            <span>ℹ️</span>
+            <span th:text="${info}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 
-    <footer th:fragment="footer" class="footer mt-auto py-3">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <span class="text-muted">© 2025 Library Management System</span>
+    <footer th:fragment="footer" style="background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-top: 1px solid rgba(255,255,255,0.1); padding: 2rem 0; margin-top: auto;">
+        <div class="container-fluid" style="padding: 0 2rem;">
+            <!-- Top Section - Links -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <!-- About -->
+                <div>
+                    <h6 style="font-weight: 700; margin-bottom: 0.75rem; color: #ffffff; font-size: 0.95rem;">
+                        <i class="bi bi-book-half"></i> LibraryHub
+                    </h6>
+                    <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; margin: 0;">
+                        Modern library management system for students and librarians.
+                    </p>
                 </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <span class="text-muted">Made with <i class="bi bi-heart-fill text-danger"></i> for readers</span>
+
+                <!-- Quick Links -->
+                <div>
+                    <h6 style="font-weight: 700; margin-bottom: 0.75rem; color: #ffffff; font-size: 0.95rem;">Quick Links</h6>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.4rem;">
+                            <a th:href="@{/dashboard}" style="color: #cbd5e1; text-decoration: none; font-size: 0.85rem; transition: all 0.3s;">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.4rem;">
+                            <a th:href="@{/books}" style="color: #cbd5e1; text-decoration: none; font-size: 0.85rem; transition: all 0.3s;">
+                                Browse Books
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/books/borrowed}" style="color: #cbd5e1; text-decoration: none; font-size: 0.85rem; transition: all 0.3s;">
+                                My Books
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Features -->
+                <div>
+                    <h6 style="font-weight: 700; margin-bottom: 0.75rem; color: #ffffff; font-size: 0.95rem;">Features</h6>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.4rem; color: #cbd5e1; font-size: 0.85rem;">
+                            <i class="bi bi-check-circle" style="color: #10b981; margin-right: 0.3rem;"></i> Book Management
+                        </li>
+                        <li style="margin-bottom: 0.4rem; color: #cbd5e1; font-size: 0.85rem;">
+                            <i class="bi bi-check-circle" style="color: #10b981; margin-right: 0.3rem;"></i> Easy Borrowing
+                        </li>
+                        <li style="color: #cbd5e1; font-size: 0.85rem;">
+                            <i class="bi bi-check-circle" style="color: #10b981; margin-right: 0.3rem;"></i> Due Date Tracking
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h6 style="font-weight: 700; margin-bottom: 0.75rem; color: #ffffff; font-size: 0.95rem;">Contact</h6>
+                    <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                        <i class="bi bi-envelope" style="margin-right: 0.3rem;"></i>
+                        <a href="mailto:indhupriya668@gmail.com" style="color: #3b82f6; text-decoration: none;">indhupriya668@gmail.com</a>
+                    </p>
+                    <p style="font-size: 0.85rem; color: #cbd5e1; margin: 0;">
+                        <i class="bi bi-geo-alt" style="margin-right: 0.3rem;"></i> SRM University Chennai
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1rem;">
+                <p style="margin: 0; font-size: 0.8rem; color: #94a3b8;">
+                    &copy; 2025 LibraryHub. All rights reserved.
+                </p>
+                <p style="margin: 0; font-size: 0.85rem; color: #cbd5e1;">
+                    Crafted by V INDHUPRIYA for Readers
+                </p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <a href="#" style="color: #cbd5e1; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">Privacy</a>
+                    <a href="#" style="color: #cbd5e1; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">Terms</a>
+                    <a href="#" style="color: #cbd5e1; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">Contact</a>
                 </div>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

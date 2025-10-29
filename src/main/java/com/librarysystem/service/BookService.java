@@ -10,12 +10,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.librarysystem.model.Activity;
 
 @Service
 public class BookService {
 
     @Autowired
     private BookRepository bookRepository;
+    
+    @Autowired
+    private ActivityService activityService;
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();
@@ -52,20 +56,32 @@ public class BookService {
     }
 
     @Transactional
-    public Book issueBook(Long bookId, User student) {
+    public Book borrowBook(Long bookId, User student, LocalDateTime borrowedDate, LocalDateTime dueDate) {
         Book book = bookRepository.findById(bookId)
             .orElseThrow(() -> new RuntimeException("Book not found"));
 
         if (!book.isAvailable()) {
-            throw new RuntimeException("Book is already issued");
+            throw new RuntimeException("Book is already borrowed");
         }
 
         book.setAvailable(false);
         book.setBorrowedBy(student);
-        book.setBorrowedDate(LocalDateTime.now());
-        book.setDueDate(LocalDateTime.now().plusDays(14)); // 2 weeks borrowing period
+        book.setBorrowedDate(borrowedDate != null ? borrowedDate : LocalDateTime.now());
+        book.setDueDate(dueDate != null ? dueDate : LocalDateTime.now().plusDays(14)); // Default 2 weeks borrowing period
 
-        return bookRepository.save(book);
+        Book savedBook = bookRepository.save(book);
+        
+        // Log the borrow activity
+        if (activityService != null) {
+            activityService.logBorrowActivity(student, book);
+        }
+        
+        return savedBook;
+    }
+    
+    @Transactional
+    public Book borrowBook(Long bookId, User student) {
+        return borrowBook(bookId, student, null, null);
     }
 
     @Transactional
@@ -77,6 +93,7 @@ public class BookService {
             throw new RuntimeException("Book is already returned");
         }
 
+        User borrower = book.getBorrowedBy();
         double fine = book.calculateFine();
         book.setAvailable(true);
         book.setBorrowedBy(null);
@@ -84,6 +101,11 @@ public class BookService {
         book.setDueDate(null);
 
         Book returnedBook = bookRepository.save(book);
+        
+        // Log the return activity
+        if (activityService != null && borrower != null) {
+            activityService.logReturnActivity(borrower, book);
+        }
         
         if (fine > 0) {
             // You could add fine processing logic here
